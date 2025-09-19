@@ -9,6 +9,11 @@
     "build":"tsc -b",
     "start":"npm run build && node dist/server.js"
   },
+  "dependencies": {
+    "@repo/db":"*",
+    "@repo/zod":"*",
+    "@repo/utils":"*"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",

@@ -1,5 +1,5 @@
 import express , {Request,Response} from "express"
-
+import prisma from "@repo/db"
 
 export const registerUser = async (req:Request,res:Response) => {
     try {
