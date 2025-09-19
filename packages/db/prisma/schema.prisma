@@ -14,3 +14,30 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Users {
+  id String @id @default(uuid())
+  email String @unique
+  firstName String  
+  LastName String
+  password String 
+  createdAt DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("Users") 
+
+}
+
+model UserProfile{
+  id String @id @default(uuid())
+  phoneNumber String @unique //this has to be with the country code
+  country  String
+  
+}
+
+model Transaction{
+  id String @id @default(uuid())
+}
+
+model FailedTransactions{
+  id String @id @default(uuid())
+}
