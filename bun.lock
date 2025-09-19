@@ -33,6 +33,7 @@
         "@repo/db": "*",
         "@repo/utils": "*",
         "@repo/zod": "*",
+        "prisma": "^6.16.2",
       },
     },
     "apps/central-server": {

@@ -5,14 +5,15 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev":"tsc -b && nodemon dist/server.js",
-    "build":"tsc -b",
-    "start":"npm run build && node dist/server.js"
+    "dev": "tsc -b && nodemon dist/server.js",
+    "build": "tsc -b",
+    "start": "npm run build && node dist/server.js"
   },
   "dependencies": {
-    "@repo/db":"*",
-    "@repo/zod":"*",
-    "@repo/utils":"*"
+    "@repo/db": "*",
+    "@repo/utils": "*",
+    "@repo/zod": "*",
+    "prisma": "^6.16.2"
   },
   "keywords": [],
   "author": "",
