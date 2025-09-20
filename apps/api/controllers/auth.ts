@@ -19,17 +19,15 @@ export const registerUser = async (req: Request, res: Response) => {
     if (!validation.success) {
       return res
         .status(400)
-        .json({ error: "Enter the data in the correct format" });
+        .json({ success: false, message: "validation failed" });
     }
 
     const { firstName, lastName, email, password } = validation.data;
 
-    const existingUser = await prisma.users.findUnique({
-      where: { email: email },
-    });
+    const existingUser = await prisma.users.findUnique({ where: { email } });
 
     if (existingUser) {
-      return res.status(400).json({ error: "User already exists" });
+      return res.status(409).json({ success:false,message: "User already exists" });
     }
 
     const hashedPwd = await hashPassword(password);
@@ -58,16 +56,19 @@ export const registerUser = async (req: Request, res: Response) => {
     });
 
     if (!checkUser) {
-      return res.status(500).json({ error: "Registration Process Failed" });
+      return res.status(500).json({ success:false,message: "Registration Process Failed" });
     } else {
       return res.status(201).json({
+        success:true,
         message: "User registered successfully",
-        user: user,
+        user: checkUser,
       });
     }
   } catch (error) {
-    console.error("Registration Error:", error);
-    return res.status(500).json({ error: "Internal Server Error" });
+    console.log(error);
+    return res
+      .status(500)
+      .json({ success: false, message: (error as Error).message });
   }
 };
 
@@ -78,23 +79,21 @@ export const loginUser = async (req: Request, res: Response) => {
     if (!validation.success) {
       return res
         .status(400)
-        .json({ error: "Enter the data in the correct format" });
+        .json({ success:false,message: "validation failed" });
     }
 
     const { email, password } = validation.data;
 
-    const user = await prisma.users.findUnique({
-      where: { email: email },
-    });
+    const user = await prisma.users.findUnique({ where: { email } });
 
     if (!user) {
-      return res.status(401).json({ error: "Invalid credentials" });
+      return res.status(401).json({ success:false,message: "User not registered" });
     }
 
     const isValidPwd = await verifyPassword(password, user.password);
 
     if (!isValidPwd) {
-      return res.status(401).json({ error: "Invalid credentials" });
+      return res.status(401).json({ success:false,message: "Invalid credentials" });
     }
 
     const accessTokenPayload = {
@@ -145,6 +144,7 @@ export const loginUser = async (req: Request, res: Response) => {
       .cookie("accessToken", accessToken, options)
       .cookie("refreshToken", refreshToken, options)
       .json({
+        success:true,
         message: "User logged in successfully",
         user: {
           id: user.id,
@@ -154,8 +154,10 @@ export const loginUser = async (req: Request, res: Response) => {
         },
       });
   } catch (error) {
-    console.error("Login Error:", error);
-    return res.status(500).json({ error: "Internal Server Error" });
+    console.log(error);
+    return res
+      .status(500)
+      .json({ success: false, message: (error as Error).message });
   }
 };
 
@@ -166,13 +168,13 @@ export const me = async (req: Request, res: Response) => {
       req.headers.authorization?.replace("Bearer ", "");
 
     if (!token) {
-      return res.status(401).json({ error: "Access token required" });
+      return res.status(401).json({ success:false,message: "Access token required" });
     }
 
     const decoded = verifyAccessToken(token, process.env.ACCESS_TOKEN_SECRET!);
 
     if (!decoded) {
-      return res.status(401).json({ error: "Invalid or expired token" });
+      return res.status(401).json({ success:false,message: "Invalid or expired token" });
     }
 
     const { userId } = decoded as any;
@@ -191,16 +193,19 @@ export const me = async (req: Request, res: Response) => {
     });
 
     if (!user) {
-      return res.status(404).json({ error: "User not found" });
+      return res.status(404).json({ success:false,message: "User not found" });
     }
 
     return res.status(200).json({
-      message: "User fetched successfully",
+      success:true,
+      message: "User info fetched successfully",
       user: user,
     });
   } catch (error) {
-    console.error("Me Error:", error);
-    return res.status(500).json({ error: "Internal Server Error" });
+    console.log(error);
+    return res
+      .status(500)
+      .json({ success: false, message: (error as Error).message });
   }
 };
 
@@ -209,7 +214,7 @@ export const refreshTokens = async (req: Request, res: Response) => {
     const normieRT = req.cookies?.refreshToken;
 
     if (!normieRT) {
-      return res.status(401).json({ error: "Refresh token required" });
+      return res.status(401).json({ success:false,message: "Refresh token required" });
     }
 
     const decoded = verifyRefreshToken(
@@ -220,7 +225,7 @@ export const refreshTokens = async (req: Request, res: Response) => {
     if (!decoded) {
       return res
         .status(401)
-        .json({ error: "Invalid or expired refresh token" });
+        .json({success:false,message: "Invalid or expired refresh token" });
     }
 
     const { userId } = decoded as any;
@@ -229,8 +234,8 @@ export const refreshTokens = async (req: Request, res: Response) => {
 
     if (!user || !user.refreshToken) {
       return res
-        .status(404)
-        .json({ error: "User not found or no refresh token stored" });
+        .status(401)
+        .json({ success:false,message: "User not found or no refresh token stored" });
     }
     
     const isValidRT = await verifyPassword(
@@ -239,7 +244,7 @@ export const refreshTokens = async (req: Request, res: Response) => {
     );
 
     if (!isValidRT) {
-      return res.status(401).json({ error: "Invalid refresh token" });
+      return res.status(401).json({ success:false,message: "Invalid refresh token" });
     }
 
     const newTokens = rotateTokens(
@@ -276,9 +281,11 @@ export const refreshTokens = async (req: Request, res: Response) => {
     return res
       .cookie("accessToken", newTokens.accessToken, options)
       .cookie("refreshToken", newTokens.refreshToken, options)
-      .json({ message: "Tokens refreshed successfully" });
+      .json({success:true, message: "Tokens refreshed successfully" });
   } catch (error) {
-    console.error("Token refresh error:", error);
-    return res.status(500).json({ error: "Token refresh failed" });
+    console.log(error)
+    return res
+      .status(500)
+      .json({ success: false, message: (error as Error).message });
   }
 };
