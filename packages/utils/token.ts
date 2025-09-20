@@ -1,25 +1,24 @@
-// hash pwd,verify pwd,create access token,create refresh token, verify access n refresh token,hash refresh token,rotate tokens(generating new tokens)
+ 
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-
-type AccessTokenPayload = {
+import { JwtPayload } from "jsonwebtoken";
+export interface AccessTokenPayload extends JwtPayload {
   userId: string;
-  email: string;
-  firstName: string;
-  lastName: string;
+  
 }
 
-type RefreshTokenPayload = {
+export interface RefreshTokenPayload extends JwtPayload {
   userId: string;
 }
 
 export const hashPassword = async (password: string) => {
-  const hash = await bcrypt.hash(password, 12);
+  const saltRounds = 14;
+  const hash = await bcrypt.hash(password, saltRounds);
   return hash;
 };
 
-export const verifyPassword = async (password: string, hash: string) => {
-  return bcrypt.compare(password, hash);
+export const verifyPassword = async (password: string, hashedPassword: string) => {
+  return bcrypt.compare(password, hashedPassword);
 };
 
 export const createAccessToken = (

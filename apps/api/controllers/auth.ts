@@ -99,9 +99,7 @@ export const loginUser = async (req: Request, res: Response) => {
 
     const accessTokenPayload = {
       userId: user.id,
-      email: user.email,
-      firstName: user.firstName,
-      lastName: user.lastName,
+       
     };
 
     const refreshTokenPayload = {
