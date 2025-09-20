@@ -1,15 +1,31 @@
-import express,{Request,Response} from "express"
- 
-const app = express()
-const port = 4000
+import express, { Request, Response } from "express";
+import dotenv from "dotenv";
+dotenv.config();
+import cors from "cors";
+import cookieParser from "cookie-parser";
+import authRouter from "./routes/auth";
 
+const app = express();
+const port = 4000;
 
+app.use(
+  cors({
+    origin: process.env.CORS_ORIGIN!,
+    credentials: true,
+  })
+);
 
-app.get("/health",async (req:Request,res:Response) => {
-    res.json({
-        success:true,
-        message:"API workin"
-    })
-})
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
-app.listen(port)
+app.use("/api/user", authRouter);
+
+app.get("/health", async (req: Request, res: Response) => {
+  res.json({
+    success: true,
+    message: "API workin",
+  });
+});
+
+app.listen(port);

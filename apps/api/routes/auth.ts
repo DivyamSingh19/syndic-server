@@ -1,15 +1,17 @@
-import express,{Request,Response} from "express"
-import { registerUser,loginUser } from "../controllers/auth";
+import express, { Request, Response } from "express";
+import {
+  registerUser,
+  loginUser,
+  me,
+  refreshTokens,
+} from "../controllers/auth";
+import { authMiddleware } from "../middlewares/auth";
+
 const authRouter = express.Router();
 
+authRouter.post("/register", registerUser);
+authRouter.post("/login", loginUser);
+authRouter.get("/me", authMiddleware, me);
+authRouter.post("/refresh", refreshTokens);
 
-authRouter.post("/register",async (req:Request,res:Response) => {
-    
-})
-
-authRouter.post("/login",async (req:Request,res:Response) => {
-    
-})
-
-
-export default authRouter
+export default authRouter;

@@ -13,10 +13,16 @@
     "@repo/db": "*",
     "@repo/utils": "*",
     "@repo/zod": "*",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
     "prisma": "^6.16.2"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs"
+  "type": "commonjs",
+  "devDependencies": {
+    "@types/cookie-parser": "^1.4.9",
+    "@types/cors": "^2.8.19"
+  }
 }
