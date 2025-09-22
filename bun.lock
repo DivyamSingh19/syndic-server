@@ -46,6 +46,11 @@
     "apps/central-server": {
       "name": "central-server",
       "version": "1.0.0",
+      "dependencies": {
+        "@repo/db": "*",
+        "@repo/utils": "*",
+        "@repo/zod": "*",
+      },
     },
     "packages/db": {
       "name": "@repo/db",

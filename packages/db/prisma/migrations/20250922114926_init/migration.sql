@@ -3,8 +3,10 @@ CREATE TABLE "public"."Users" (
     "id" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "firstName" TEXT NOT NULL,
-    "LastName" TEXT NOT NULL,
+    "lastName" TEXT NOT NULL,
     "password" TEXT NOT NULL,
+    "isVerified" BOOLEAN NOT NULL DEFAULT false,
+    "refreshToken" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -36,6 +38,9 @@ CREATE TABLE "public"."FailedTransactions" (
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Users_email_key" ON "public"."Users"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Users_refreshToken_key" ON "public"."Users"("refreshToken");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "UserProfile_phoneNumber_key" ON "public"."UserProfile"("phoneNumber");

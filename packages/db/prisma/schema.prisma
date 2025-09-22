@@ -36,10 +36,19 @@ model UserProfile{
   
 }
 
-model Transaction{
+model SuccessfulTransaction{
   id String @id @default(uuid())
+  userId String
+  receiverId String?
+  currencySent  String
+  currencyReceived String
+  senderCountry   String
+  receiverCountry  String
+  routeUsed        String
+  
 }
 
 model FailedTransactions{
   id String @id @default(uuid())
 }
+
