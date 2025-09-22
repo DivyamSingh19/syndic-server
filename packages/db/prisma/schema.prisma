@@ -26,15 +26,25 @@ model Users {
   updatedAt  DateTime @updatedAt
 
   @@map("Users") 
-
+  //relations
+  userProfile  UserProfile[]
 }
 
 model UserProfile{
   id String @id @default(uuid())
   phoneNumber String @unique //this has to be with the country code
   country  String
-  
-}
+  address  String
+  pnIsVerified  String
+  platformPin  Int 
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+
+  //relation
+  userID   String  @unique
+  user     Users @relation(fields: [userID], references: [id])
+ }
 
 model SuccessfulTransaction{
   id String @id @default(uuid())
@@ -45,7 +55,7 @@ model SuccessfulTransaction{
   senderCountry   String
   receiverCountry  String
   routeUsed        String
-  
+
 }
 
 model FailedTransactions{
