@@ -1,4 +1,4 @@
-import { setupProfile,editProfile,getUserProfileData } from "../controllers/profile";
+import { setupProfile,getUserProfileData } from "../controllers/profile";
 import express,{NextFunction, Request,Response} from "express"
 import { authMiddleware } from "../middlewares/auth";
 const profileRouter = express.Router()
@@ -10,14 +10,14 @@ profileRouter.post("/setupProfile",authMiddleware,async (req:Request,res:Respons
         next()
     }
 })
-
-profileRouter.put("/edit-profile",authMiddleware,async (req:Request,res:Response,next:NextFunction) => {
-    try {
-        editProfile(req,res)
-    } catch (error) {
-        next()
-    }
-})
+//will be done later in prod
+// profileRouter.put("/edit-profile",authMiddleware,async (req:Request,res:Response,next:NextFunction) => {
+//     try {
+//         editProfile(req,res)
+//     } catch (error) {
+//         next()
+//     }
+// })
 
 profileRouter.get("/user-data",authMiddleware,async (req:Request,res:Response,next:NextFunction) => {
     try {
