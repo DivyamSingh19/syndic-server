@@ -69,7 +69,5 @@ export const setupProfileSchema = z.object({
     .max(500, "Address is too long")
     .trim(),
   
-  platformPin: z
-    .string()
-    .regex(/^\d{4,6}$/, "Platform PIN must be 4-6 digits")
+
 });
