@@ -19,7 +19,7 @@ export const registerUser = async (req: Request, res: Response) => {
     if (!validation.success) {
       return res
         .status(400)
-        .json({ success: false, message: "validation failed" });
+        .json({ success: false, message: "Validation failed" });
     }
 
     const { firstName, lastName, email, password } = validation.data;
@@ -209,14 +209,14 @@ export const me = async (req: Request, res: Response) => {
 
 export const refreshTokens = async (req: Request, res: Response) => {
   try {
-    const normieRT = req.cookies?.refreshToken;
+    const normalRefreshToken = req.cookies?.refreshToken;
 
-    if (!normieRT) {
+    if (!normalRefreshToken) {
       return res.status(401).json({ success:false,message: "Refresh token required" });
     }
 
     const decoded = verifyRefreshToken(
-      normieRT,
+      normalRefreshToken,
       process.env.REFRESH_TOKEN_SECRET!
     );
 
@@ -237,7 +237,7 @@ export const refreshTokens = async (req: Request, res: Response) => {
     }
     
     const isValidRT = await verifyPassword(
-      normieRT,
+      normalRefreshToken,
       user.refreshToken
     );
 

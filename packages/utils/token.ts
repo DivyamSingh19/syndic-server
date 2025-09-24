@@ -57,6 +57,16 @@ export const hashRefreshToken = async (token: string) => {
   return await bcrypt.hash(token, 12);
 };
 
+
+export const decodedAccessToken = async (token:string) => {
+  try {
+    
+  } catch (error) {
+    
+  }
+}
+
+ 
 export const rotateTokens = (
   accessPayload: AccessTokenPayload, 
   refreshPayload: RefreshTokenPayload,

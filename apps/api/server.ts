@@ -24,13 +24,10 @@ app.use(cookieParser());
 
 
 
-
 //APIs
-app.use("/api/v1/auth", authRouter);
-app.use("/api/v1/user",profileRouter)
-app.use("/api/v1/pin",pinRouter)
-
-
+app.use("/api/v1/auth", authRouter); //auth
+app.use("/api/v1/user",profileRouter) //profile
+app.use("/api/v1/pin",pinRouter) //pin
 
 
 

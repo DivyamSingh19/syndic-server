@@ -1,8 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
   provider = "prisma-client-js"
@@ -28,6 +23,8 @@ model Users {
   @@map("Users") 
   //relations
   userProfile  UserProfile[]
+  successfulTransactions  SuccessfulTransactions[]
+  failedTransactions     FailedTransactions[]
 }
 
 model UserProfile{
@@ -36,7 +33,7 @@ model UserProfile{
   country  String
   address  String
   pnIsVerified  String
-  platformPin  Int 
+  platformPin  String 
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
@@ -46,7 +43,22 @@ model UserProfile{
   user     Users @relation(fields: [userID], references: [id])
  }
 
-model SuccessfulTransaction{
+model SuccessfulTransactions{
+  id String @id @default(uuid())
+  userId String
+  receiverId String?
+  currencySent  String
+  currencyReceived String
+  senderCountry   String
+  receiverCountry  String
+  routeUsed        String
+  
+  //relations
+  userID  String @unique
+  user  Users  @relation(fields: [userID],references: [id])
+}
+
+model FailedTransactions{
   id String @id @default(uuid())
   userId String
   receiverId String?
@@ -56,9 +68,8 @@ model SuccessfulTransaction{
   receiverCountry  String
   routeUsed        String
 
-}
 
-model FailedTransactions{
-  id String @id @default(uuid())
+  userID  String @unique
+  user    Users  @relation(fields: [userID],references: [id])
 }
 
