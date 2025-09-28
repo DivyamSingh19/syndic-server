@@ -4,9 +4,7 @@ import { verifyAccessToken } from "@repo/utils";
 interface AuthenticatedRequest extends Request {
   user?: {
     userId: string;
-    email: string;
-    firstName: string;
-    lastName: string;
+    
   };
 }
 

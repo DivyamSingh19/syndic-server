@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import authRouter from "./routes/auth";
 import profileRouter from "./routes/profile";
 import pinRouter from "./routes/pin";
+import otpRouter from "./routes/otp";
 
 const app = express();
 const port = 4000;
@@ -28,7 +29,7 @@ app.use(cookieParser());
 app.use("/api/v1/auth", authRouter); //auth
 app.use("/api/v1/user",profileRouter) //profile
 app.use("/api/v1/pin",pinRouter) //pin
-
+app.use('/api/v1/otp',otpRouter)//otp  
 
 
 
