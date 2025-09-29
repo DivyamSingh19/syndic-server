@@ -10,37 +10,22 @@ import otpRouter from "./routes/otp";
 
 const app = express();
 const port = 4000;
- 
+
 app.use(express.json());
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: process.env.CORS_ORIGIN!,
     credentials: true,
   })
 );
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-
-
-
-
-
-
-
-
-
 //APIs
 app.use("/api/v1/auth", authRouter); //auth
-app.use("/api/v1/user",profileRouter) //profile
-app.use("/api/v1/pin",pinRouter) //pin
-app.use('/api/v1/otp',otpRouter)//otp  
-
-
-
-
-
-
+app.use("/api/v1/user", profileRouter); //profile
+app.use("/api/v1/pin", pinRouter); //pin
+app.use("/api/v1/otp", otpRouter); //otp
 
 app.get("/health", async (req: Request, res: Response) => {
   res.json({
@@ -49,6 +34,6 @@ app.get("/health", async (req: Request, res: Response) => {
   });
 });
 
-app.listen(port,()=>{
-  console.log("Server started on :",port)
+app.listen(port, () => {
+  console.log("Server started on :", port);
 });
