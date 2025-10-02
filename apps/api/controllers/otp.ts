@@ -49,40 +49,48 @@ export const sendOTP = async (req:Request,res:Response) => {
     }
 }
 
-
-export const verifyOTP = async (req:Request,res:Response) => {
-    try {
-        const {userEmail,otp} = req.body
-        if(!userEmail||!otp){
-            return res.status(400).json({
-                success:false,
-                message:"Bad request , email or OTP missing"
-            })
-        }
-         const storedOTP = await redis.get(`otp:${userEmail}`)
-         if(!storedOTP){
-            return res.status(404).json({
-                success:false,
-                message:"OTP expired or not found"
-            })
-         }
-         if(storedOTP !== otp){
-            return res.status(400).json({
-                success:false,
-                message:"Invalid OTP"
-            })
-         }
-         await redis.del(`otp:${userEmail}`)
-         
-         return res.status(200).json({
-             success: true,
-             message: "OTP verified successfully"
-         })
-    } catch (error) {
-        console.log(error)
-        return res.status(500).json({
-            success:false,
-            message:"Could not verify OTP, internal server error"
-        })
+export const verifyOTP = async (req: Request, res: Response) => {
+  try {
+    const { userEmail, otp } = req.body;
+    if (!userEmail || !otp) {
+      return res.status(400).json({
+        success: false,
+        message: "Bad request, email or OTP missing",
+      });
     }
-}
+
+    const storedOTP = await redis.get(`otp:${userEmail}`);
+    if (!storedOTP) {
+      return res.status(404).json({
+        success: false,
+        message: "OTP expired or not found",
+      });
+    }
+
+    if (storedOTP !== otp) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid OTP",
+      });
+    }
+
+    await redis.del(`otp:${userEmail}`);
+
+    const updatedUser = await prisma.users.update({
+      where: { email: userEmail },
+      data: { isVerified: true }, 
+    });
+
+   return res.status(200).json({
+     success: true,
+     message: "OTP verified successfully",
+     data: { email: updatedUser.email, isVerified: updatedUser.isVerified },
+   });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: "Could not verify OTP, internal server error",
+    });
+  }
+};
