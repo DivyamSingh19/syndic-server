@@ -14,12 +14,13 @@ import prisma from '@repo/db';
 // Configuration
 const SOLANA_RPC_URL = process.env.SOLANA_RPC_URL || 'https://api.devnet.solana.com';
 const SENDER_PRIVATE_KEY = process.env.SOLANA_PRIVATE_KEY || ''; // Base58 encoded private key
-const SOLANA_AMOUNT = 1.2; 
+ 
 
 interface FiatToCryptoRequest {
   success: boolean;
   receiverWallet: string;
   userEmail: string;
+  amount:number
 }
 
 const sendSolana = async (
@@ -67,9 +68,9 @@ export const fiatToCryptoController = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { success, receiverWallet, userEmail }: FiatToCryptoRequest = req.body;
+    const { success, receiverWallet, userEmail, amount }: FiatToCryptoRequest = req.body;
     
-    // Validate required fields
+    
     if (!success || !receiverWallet || !userEmail) {
       res.status(400).json({
         success: false,
@@ -100,7 +101,7 @@ export const fiatToCryptoController = async (
     }
     
     // Send Solana
-    const solanaSignature = await sendSolana(receiverWallet, SOLANA_AMOUNT);
+    const solanaSignature = await sendSolana(receiverWallet, amount);
     
     // Store transaction in database
     const transaction = await prisma.fiatToCryptoTransactions.create({
@@ -121,7 +122,7 @@ export const fiatToCryptoController = async (
       success: true,
       message: 'Solana sent successfully',
       solanaSignature,
-      amount: SOLANA_AMOUNT,
+      amount: amount,
       receiverWallet,
       transactionId: transaction.id,
       userEmail,
