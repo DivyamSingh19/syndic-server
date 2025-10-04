@@ -73,8 +73,6 @@ export const addMoney = async (req:Request,res:Response) => {
                 message: "Receiver email, amount, and currency are required"
             });
         }
-
-        // Validate currency
         const validCurrencies = ['AED', 'INR', 'USD'];
         if (!validCurrencies.includes(currency)) {
             return res.status(400).json({
@@ -83,7 +81,6 @@ export const addMoney = async (req:Request,res:Response) => {
             });
         }
 
-        // Validate amount
         if (typeof amount !== 'number' || amount <= 0) {
             return res.status(400).json({
                 success: false,
