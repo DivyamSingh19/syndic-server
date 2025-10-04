@@ -3,6 +3,7 @@ import cors from "cors"
 import cookieParser from "cookie-parser"
 import { Request,Response } from "express"
 import razorpayRouter from "./routes/razorpay"
+import fiatToCryptoRouter from "./routes/fiattocrypto.route"
 // import demoTransactionRouter from "./routes/demotransaction.routes"
 
 
@@ -29,7 +30,7 @@ app.get('/health', async (req:Request,res:Response) => {
 
 app.use('/api/v2/razorpay',razorpayRouter)
 // app.use('/api/v2/demo-transaction',demoTransactionRouter)
-
+app.use('/api/v2/transaction/combination',fiatToCryptoRouter)
 app.listen(port,()=>{
     console.log("Server started on :",port)
 })

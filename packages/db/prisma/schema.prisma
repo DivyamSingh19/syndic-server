@@ -173,14 +173,14 @@ model CryptoToFiatTransactions{
 
 model FiatToCryptoTransactions{
   id  String @id @default(uuid())
-  userId  String 
-  user Users  @relation(fields: [userId],references: [id])
+  userEmail  String 
+  user Users  @relation(fields: [userEmail],references: [email])
   senderCurrency String
   receiverId  String? 
   receiverWallet String
   recieverCrypto String
   routes     FiatToCryptoRoutes[]
-  
+
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }
