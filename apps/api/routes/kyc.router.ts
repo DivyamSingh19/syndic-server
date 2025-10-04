@@ -1,5 +1,5 @@
 import express, { Request, Response, NextFunction } from "express";
-import { addKYCInfo, updateKYC } from "../controllers/kyc.controller";
+import { addKYCInfo } from "../controllers/kyc.controller";
 import { upload } from "../utils/cloudinaryUpload";
 
 const kycRouter = express.Router();
@@ -10,9 +10,9 @@ kycRouter.post("/add", upload.fields([
   { name: 'aadhaarImage', maxCount: 1 }
 ]), addKYCInfo);
 
-kycRouter.put("/update/:userId", upload.fields([
-  { name: 'panImage', maxCount: 1 },
-  { name: 'aadhaarImage', maxCount: 1 }
-]), updateKYC);
+// kycRouter.put("/update/:userId", upload.fields([
+//   { name: 'panImage', maxCount: 1 },
+//   { name: 'aadhaarImage', maxCount: 1 }
+// ]), updateKYC);
 
 export default kycRouter;

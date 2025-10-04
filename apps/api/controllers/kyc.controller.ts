@@ -95,77 +95,77 @@ export const addKYCInfo = async (req: Request, res: Response) => {
 };
 
 // Update existing KYC information
-export const updateKYC = async (req: Request, res: Response) => {
-  try {
-    const { userId } = req.params;
-    const { panNumber, aadhaarNumber } = req.body;
+// export const updateKYC = async (req: Request, res: Response) => {
+//   try {
+//     const { userId } = req.params;
+//     const { panNumber, aadhaarNumber } = req.body;
 
-    // Check if KYC exists
-    const existingKYC = await prisma.userKYC.findUnique({
-      where: { userId }
-    });
+//     // Check if KYC exists
+//     const existingKYC = await prisma.userKYC.findUnique({
+//       where: { userId }
+//     });
 
-    if (!existingKYC) {
-      return res.status(404).json({
-        success: false,
-        message: 'KYC not found'
-      });
-    }
+//     if (!existingKYC) {
+//       return res.status(404).json({
+//         success: false,
+//         message: 'KYC not found'
+//       });
+//     }
 
-    // Get uploaded files
-    const files = req.files as { [fieldname: string]: Express.Multer.File[] };
-    const panImageFile = files?.panImage?.[0];
-    const aadhaarImageFile = files?.aadhaarImage?.[0];
+//     // Get uploaded files
+//     const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+//     const panImageFile = files?.panImage?.[0];
+//     const aadhaarImageFile = files?.aadhaarImage?.[0];
 
-    let updateData: any = {
-      ...(panNumber && { panNumber }),
-      ...(aadhaarNumber && { aadhaarNumber }),
-    };
+//     let updateData: any = {
+//       ...(panNumber && { panNumber }),
+//       ...(aadhaarNumber && { aadhaarNumber }),
+//     };
 
-    // Upload new PAN image if provided
-    if (panImageFile) {
-      const panUploadResult = await uploadToCloudinary(
-        panImageFile.buffer,
-        `kyc/${userId}/pan`,
-        `pan_${userId}_${Date.now()}`
-      );
-      updateData.panImageUrl = panUploadResult.url;
-    }
+//     // Upload new PAN image if provided
+//     if (panImageFile) {
+//       const panUploadResult = await uploadToCloudinary(
+//         panImageFile.buffer,
+//         `kyc/${userId}/pan`,
+//         `pan_${userId}_${Date.now()}`
+//       );
+//       updateData.panImageUrl = panUploadResult.url;
+//     }
 
-    // Upload new Aadhaar image if provided
-    if (aadhaarImageFile) {
-      const aadhaarUploadResult = await uploadToCloudinary(
-        aadhaarImageFile.buffer,
-        `kyc/${userId}/aadhaar`,
-        `aadhaar_${userId}_${Date.now()}`
-      );
-      updateData.aadhaarImageUrl = aadhaarUploadResult.url;
-    }
+//     // Upload new Aadhaar image if provided
+//     if (aadhaarImageFile) {
+//       const aadhaarUploadResult = await uploadToCloudinary(
+//         aadhaarImageFile.buffer,
+//         `kyc/${userId}/aadhaar`,
+//         `aadhaar_${userId}_${Date.now()}`
+//       );
+//       updateData.aadhaarImageUrl = aadhaarUploadResult.url;
+//     }
 
-    // Update KYC record
-    const updatedKYC = await prisma.userKYC.update({
-      where: { userId },
-      data: updateData
-    });
+//     // Update KYC record
+//     const updatedKYC = await prisma.userKYC.update({
+//       where: { userId },
+//       data: updateData
+//     });
 
-    return res.status(200).json({
-      success: true,
-      message: 'KYC updated successfully',
-      data: updatedKYC
-    });
+//     return res.status(200).json({
+//       success: true,
+//       message: 'KYC updated successfully',
+//       data: updatedKYC
+//     });
 
-  } catch (error: any) {
-    if (error.code === 'P2002') {
-      return res.status(409).json({
-        success: false,
-        message: 'PAN or Aadhaar number already exists'
-      });
-    }
+//   } catch (error: any) {
+//     if (error.code === 'P2002') {
+//       return res.status(409).json({
+//         success: false,
+//         message: 'PAN or Aadhaar number already exists'
+//       });
+//     }
 
-    console.error('Error updating KYC:', error);
-    return res.status(500).json({
-      success: false,
-      message: 'Internal server error'
-    });
-  }
-};
+//     console.error('Error updating KYC:', error);
+//     return res.status(500).json({
+//       success: false,
+//       message: 'Internal server error'
+//     });
+//   }
+// };

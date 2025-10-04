@@ -382,7 +382,7 @@ export const createTransfer = async (req: Request, res: Response) => {
       fees
     }: TransferRequest = req.body;
 
-    // Validate required fields
+  
     if (!senderEmail || !receiverEmail || !senderCountry || !receiverCountry || 
         !sentAmount || !receiverAmount || !senderCurrency || !receiverCurrency || !provider) {
       return res.status(400).json({
@@ -416,9 +416,9 @@ export const createTransfer = async (req: Request, res: Response) => {
         throw new Error('Sender or receiver not found');
       }
 
-      // Get sender and receiver wallets
+    
       const [senderWallet, receiverWallet] = await Promise.all([
-        tx.syndicWallet.findUnique({
+        tx.syndicWallet.findUnique({ 
           where: { userEmail: senderEmail }
         }),
         tx.syndicWallet.findUnique({
@@ -430,7 +430,7 @@ export const createTransfer = async (req: Request, res: Response) => {
         throw new Error('Wallet not found for sender or receiver');
       }
 
-      // Check sender's balance based on currency
+      
       const senderCurrencyField = `total${senderCurrency}` as 'totalUSD' | 'totalAED' | 'totalINR';
       const receiverCurrencyField = `total${receiverCurrency}` as 'totalUSD' | 'totalAED' | 'totalINR';
       
@@ -462,7 +462,7 @@ export const createTransfer = async (req: Request, res: Response) => {
       const transaction = await tx.fiatToFiatTransaction.create({
         data: {
           userEmail: senderEmail,
-          receiverId: receiver.id,
+          receiverEmail: receiver.email,
           senderCurrency,
           receiverCurrency,
           senderCountry,
@@ -473,18 +473,18 @@ export const createTransfer = async (req: Request, res: Response) => {
         }
       });
 
-      // Record successful transaction
+     
       await tx.successfulTransactions.create({
         data: {
-          userId: sender.id,
-          receiverId: receiver.id,
+          userEmail: sender.email,
+          receiverEmail: receiver.email,
           currencySent: senderCurrency,
           currencyReceived: receiverCurrency,
           senderCountry,
           receiverCountry,
           routeUsed: provider,
           method: 'CentralizedTransaction',
-          userID: sender.id
+          
         }
       });
 

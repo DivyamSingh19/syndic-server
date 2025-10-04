@@ -83,8 +83,8 @@ model UserPlatformPin{
 }
 model UserKYC{
   id String @id @default(uuid())
-  userId String @unique
-  user   Users   @relation(fields: [userId],references: [id])
+  userEmail String @unique
+  user   Users   @relation(fields: [userEmail],references: [email])
   panNumber         String    @unique
   aadhaarNumber     String    @unique
   panImageUrl       String
@@ -95,8 +95,8 @@ model UserKYC{
 }
 model SuccessfulTransactions{
   id String @id @default(uuid())
-  userId String
-  receiverId String?
+  
+  receiverEmail String 
   currencySent  String
   currencyReceived String
   senderCountry   String
@@ -104,25 +104,23 @@ model SuccessfulTransactions{
   routeUsed        String
   method           TransactionMethod
   //relations
-  userID  String @unique
-  user  Users  @relation(fields: [userID],references: [id])
+  userEmail  String @unique
+  user  Users  @relation(fields: [userEmail],references: [email])
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }
 
 model FailedTransactions{
   id String @id @default(uuid())
-  userId String
-  receiverId String?
+  receiverEmail String
   currencySent  String
   currencyReceived String
   senderCountry   String
   receiverCountry  String
   routeUsed        String
   method           TransactionMethod
-
-  userID  String @unique
-  user    Users  @relation(fields: [userID],references: [id])
+  userEmail  String @unique
+  user    Users  @relation(fields: [userEmail],references: [email])
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }
@@ -144,7 +142,7 @@ model FiatToFiatTransaction{
   id   String @id @default(uuid())
   userEmail  String 
   user Users @relation(fields: [userEmail],references: [email])
-  receiverId String?
+  receiverEmail String?
   senderCurrency String
   receiverCurrency String
   senderCountry  String
@@ -179,7 +177,7 @@ model FiatToCryptoTransactions{
   receiverId  String? 
   receiverWallet String
   recieverCrypto String
-  routes     FiatToCryptoRoutes[]
+  
 
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
@@ -196,7 +194,7 @@ model FiatToFiatRoutes{
 model FiatToCryptoRoutes{
   id  String @id @default(uuid())
   transactionId String
-  transaction  FiatToCryptoTransactions @relation(fields: [transactionId],references: [id])
+  
   //not much as razorpay payment => success => credit crypto to receiver wallet
 }
 
