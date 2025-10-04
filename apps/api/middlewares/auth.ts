@@ -1,10 +1,12 @@
 import { Request, Response, NextFunction } from "express";
 import { verifyAccessToken } from "@repo/utils";
 
-interface AuthenticatedRequest extends Request {
+export interface AuthenticatedRequest extends Request {
   user?: {
     userId: string;
-    
+    email?: string;
+    firstName?: string;
+    lastName?: string;
   };
 }
 
@@ -14,23 +16,37 @@ export const authMiddleware = (
   next: NextFunction
 ) => {
   try {
+    // Accept both cookie and Authorization header
     const token =
       req.cookies?.accessToken ||
       req.headers.authorization?.replace("Bearer ", "");
 
     if (!token) {
-      return res.status(401).json({ error: "Access token required" });
+      return res.status(401).json({
+        success: false,
+        message: "Access token required",
+      });
     }
 
+    // Verify JWT
     const decoded = verifyAccessToken(token, process.env.ACCESS_TOKEN_SECRET!);
 
     if (!decoded) {
-      return res.status(401).json({ error: "Invalid or expired token" });
+      return res.status(401).json({
+        success: false,
+        message: "Invalid or expired token",
+      });
     }
 
-    req.user = decoded as any;
-    next(); 
+    // Attach user data to request
+    req.user = decoded as AuthenticatedRequest["user"];
+
+    next();
   } catch (error) {
-    return res.status(401).json({ error: "Authentication failed" });
+    console.error("Auth middleware error:", error);
+    return res.status(401).json({
+      success: false,
+      message: "Authentication failed",
+    });
   }
 };
