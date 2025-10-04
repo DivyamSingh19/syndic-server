@@ -4,7 +4,7 @@ import cookieParser from "cookie-parser"
 import { Request,Response } from "express"
 import razorpayRouter from "./routes/razorpay"
 import fiatToCryptoRouter from "./routes/fiattocrypto.route"
-// import demoTransactionRouter from "./routes/demotransaction.routes"
+import previousTransactionRouter from "./routes/getUserTransactions.routes"
 
 
 const app = express()
@@ -31,6 +31,7 @@ app.get('/health', async (req:Request,res:Response) => {
 app.use('/api/v2/razorpay',razorpayRouter)
 // app.use('/api/v2/demo-transaction',demoTransactionRouter)
 app.use('/api/v2/transaction/combination',fiatToCryptoRouter)
+app.use('/api/v2/get-transaction-data',previousTransactionRouter)
 app.listen(port,()=>{
     console.log("Server started on :",port)
 })

@@ -50,7 +50,7 @@ model Users {
   userProfile  UserProfile[]
   successfulTransactions  SuccessfulTransactions[]
   failedTransactions     FailedTransactions[]
-  centralizedTransactions   CentralizedTransactions[]
+  centralizedTransactions   FiatToFiatTransaction[]
   cryptoTransactions     CryptoTransactions[]
   cryptoToFiatTransactions   CryptoToFiatTransactions[]
   fiatToCryptoTransactions   FiatToCryptoTransactions[]
@@ -129,8 +129,8 @@ model FailedTransactions{
 
 model CryptoTransactions{
   id  String @id @default(uuid())
-  userId  String 
-  user Users @relation(fields: [userId],references: [id])
+  userEmail  String 
+  user Users @relation(fields: [userEmail],references: [email])
   userWallet  String  //crypto wallet address
   receiverWallet  String 
   senderCrypto  String
@@ -140,10 +140,10 @@ model CryptoTransactions{
   updatedAt   DateTime @updatedAt
 }
 
-model CentralizedTransactions{
+model FiatToFiatTransaction{
   id   String @id @default(uuid())
-  userId  String 
-  user Users @relation(fields: [userId],references: [id])
+  userEmail  String 
+  user Users @relation(fields: [userEmail],references: [email])
   receiverId String?
   senderCurrency String
   receiverCurrency String
@@ -157,8 +157,8 @@ model CentralizedTransactions{
 
 model CryptoToFiatTransactions{
   id   String @id  @default(uuid())
-  userId  String
-  user Users @relation(fields: [userId],references: [id])
+  userEmail  String
+  user Users @relation(fields: [userEmail],references: [email])
   senderWalletAddress String
   receiverId   String? 
   receiverCurrency String
@@ -189,7 +189,7 @@ model FiatToCryptoTransactions{
 model FiatToFiatRoutes{
   id String @id @default(uuid())
   transactionId String
-  transaction CentralizedTransactions @relation(fields: [transactionId],references: [id])
+  transaction FiatToFiatTransaction @relation(fields: [transactionId],references: [id])
 
 }
 
