@@ -229,9 +229,9 @@ model CryptoToCryptoRoutes{
 
 model SyndicWallet{
   id  String @id @default(uuid())
-  totalAED   Float?
-  totalINR   Float?
-  totalUSD   Float?
-  userId  String @unique
-  user    Users @relation(fields: [userId],references: [id])
+  totalAED   Float @default(0)
+  totalINR   Float @default(0)
+  totalUSD   Float @default(0)
+  userEmail  String @unique
+  user    Users @relation(fields: [userEmail],references: [email])
 }
