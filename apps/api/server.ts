@@ -11,7 +11,7 @@ import verificationRouter from "./routes/verifyUser";
 
 const app = express();
 const port = 4000;
- 
+
 app.use(express.json());
 app.use(cors({
   origin: "http://localhost:3000", 
@@ -19,15 +19,6 @@ app.use(cors({
 }))
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-
-
-
-
-
-
-
-
-
 
 //APIs
 app.use("/api/v1/auth", authRouter); //auth
@@ -48,6 +39,6 @@ app.get("/health", async (req: Request, res: Response) => {
   });
 });
 
-app.listen(port,()=>{
-  console.log("Server started on :",port)
+app.listen(port, () => {
+  console.log("Server started on :", port);
 });

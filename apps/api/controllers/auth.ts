@@ -43,7 +43,6 @@ export const registerUser = async (req: Request, res: Response) => {
         isVerified: false,
       },
     });
-
     const checkUser = await prisma.users.findUnique({
       where: { id: user.id },
       select: {
