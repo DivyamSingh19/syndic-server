@@ -34,6 +34,7 @@ app.use('/api/v2/razorpay',razorpayRouter)
 app.use('/api/v2/transaction/combination',fiatToCryptoRouter)
 app.use('/api/v2/get-transaction-data',previousTransactionRouter)
 app.use('/api/v2/wallet',walletRouter)
+app.use('/api/v2/transaction/fiat-to-fiat',)
 app.listen(port,()=>{
     console.log("Server started on :",port)
 })

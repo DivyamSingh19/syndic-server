@@ -354,6 +354,164 @@ const getPayPalQuote = async (amount: number, fromCurrency: string, toCurrency: 
   }
 };
 
-export default { getQuote };
+interface TransferRequest {
+  senderEmail: string;
+  receiverEmail: string;
+  senderCountry: string;
+  receiverCountry: string;
+  sentAmount: number;
+  receiverAmount: number;
+  senderCurrency: string;
+  receiverCurrency: string;
+  provider: string;
+  fees: number;
+}
+
+export const createTransfer = async (req: Request, res: Response) => {
+  try {
+    const {
+      senderEmail,
+      receiverEmail,
+      senderCountry,
+      receiverCountry,
+      sentAmount,
+      receiverAmount,
+      senderCurrency,
+      receiverCurrency,
+      provider,
+      fees
+    }: TransferRequest = req.body;
+
+    // Validate required fields
+    if (!senderEmail || !receiverEmail || !senderCountry || !receiverCountry || 
+        !sentAmount || !receiverAmount || !senderCurrency || !receiverCurrency || !provider) {
+      return res.status(400).json({
+        success: false,
+        message: 'Missing required fields: senderEmail, receiverEmail, senderCountry, receiverCountry, sentAmount, receiverAmount, senderCurrency, receiverCurrency, provider'
+      });
+    }
+
+    // Validate currencies
+    const validCurrencies = ['USD', 'AED', 'INR'];
+    if (!validCurrencies.includes(senderCurrency) || !validCurrencies.includes(receiverCurrency)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid currency. Supported currencies: USD, AED, INR'
+      });
+    }
+
+    // Use Prisma transaction for atomicity
+    const result = await prisma.$transaction(async (tx) => {
+      // Get sender and receiver details
+      const [sender, receiver] = await Promise.all([
+        tx.users.findUnique({
+          where: { email: senderEmail }
+        }),
+        tx.users.findUnique({
+          where: { email: receiverEmail }
+        })
+      ]);
+
+      if (!sender || !receiver) {
+        throw new Error('Sender or receiver not found');
+      }
+
+      // Get sender and receiver wallets
+      const [senderWallet, receiverWallet] = await Promise.all([
+        tx.syndicWallet.findUnique({
+          where: { userEmail: senderEmail }
+        }),
+        tx.syndicWallet.findUnique({
+          where: { userEmail: receiverEmail }
+        })
+      ]);
+
+      if (!senderWallet || !receiverWallet) {
+        throw new Error('Wallet not found for sender or receiver');
+      }
+
+      // Check sender's balance based on currency
+      const senderCurrencyField = `total${senderCurrency}` as 'totalUSD' | 'totalAED' | 'totalINR';
+      const receiverCurrencyField = `total${receiverCurrency}` as 'totalUSD' | 'totalAED' | 'totalINR';
+      
+      if (senderWallet[senderCurrencyField] < sentAmount) {
+        throw new Error(`Insufficient ${senderCurrency} balance`);
+      }
+
+      // Deduct amount from sender's wallet
+      await tx.syndicWallet.update({
+        where: { userEmail: senderEmail },
+        data: { 
+          [senderCurrencyField]: { 
+            decrement: sentAmount 
+          } 
+        }
+      });
+
+      // Add amount to receiver's wallet
+      await tx.syndicWallet.update({
+        where: { userEmail: receiverEmail },
+        data: { 
+          [receiverCurrencyField]: { 
+            increment: receiverAmount 
+          } 
+        }
+      });
+
+      // Create transaction record
+      const transaction = await tx.fiatToFiatTransaction.create({
+        data: {
+          userEmail: senderEmail,
+          receiverId: receiver.id,
+          senderCurrency,
+          receiverCurrency,
+          senderCountry,
+          receiverCountry,
+          routes: {
+            create: {}
+          }
+        }
+      });
+
+      // Record successful transaction
+      await tx.successfulTransactions.create({
+        data: {
+          userId: sender.id,
+          receiverId: receiver.id,
+          currencySent: senderCurrency,
+          currencyReceived: receiverCurrency,
+          senderCountry,
+          receiverCountry,
+          routeUsed: provider,
+          method: 'CentralizedTransaction',
+          userID: sender.id
+        }
+      });
+
+      return {
+        transactionId: transaction.id,
+        amountSent: sentAmount,
+        amountReceived: receiverAmount,
+        fees: fees || (sentAmount - receiverAmount)
+      };
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: 'Transfer completed successfully',
+      ...result,
+      timestamp: new Date().toISOString()
+    });
+
+  } catch (error: any) {
+    console.error('Transfer error:', error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || 'Failed to process transfer'
+    });
+  }
+};
+
+export default { getQuote, createTransfer };
 
  
