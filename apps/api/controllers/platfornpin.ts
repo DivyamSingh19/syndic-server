@@ -43,28 +43,25 @@ export const createPin = async (req: Request, res: Response) => {
       });
     }
     const pin = verifyPin.data;
-    const existingProfile = await prisma.userProfile.findUnique({
+    const existingPin = await prisma.userPlatformPin.findUnique({
       where: { userID: userId },
       select: { platformPin: true },
     });
-    if (!existingProfile) {
-      return res.json({
-        success: false,
-        message:
-          "User profile not found.Please complete your profile setup first",
-      });
-    }
 
-    if (existingProfile?.platformPin !== null) {
+    if (existingPin?.platformPin !== null) {
       return res.json({
         success: false,
         message: "Pin has already been set",
       });
     }
     const hashedPin = await hashPassword(pin.toString());
-    const updatedProfile = await prisma.userProfile.update({
+    const updatedPin = await prisma.userPlatformPin.upsert({
       where: { userID: userId },
-      data: {
+      update: {
+        platformPin: hashedPin,
+      },
+      create: {
+        userID: userId,
         platformPin: hashedPin,
       },
     });
@@ -131,19 +128,19 @@ export const editPin = async (req: Request, res: Response) => {
     
     const { pin } = verifyPin.data;
     
-    const existingProfile = await prisma.userProfile.findUnique({
+    const existingPin = await prisma.userPlatformPin.findUnique({
       where: { userID: userId },
       select: { platformPin: true },
     });
     
-    if (!existingProfile) {
+    if (!existingPin) {
       return res.status(404).json({
         success: false,
-        message: "User profile not found. Please complete your profile setup first",
+        message: "User PIN record not found. Please create a PIN first",
       });
     }
     
-    if (existingProfile.platformPin === null) {
+    if (existingPin.platformPin === null) {
       return res.status(400).json({
         success: false,
         message: "No PIN found. Please create a PIN first"
@@ -151,7 +148,7 @@ export const editPin = async (req: Request, res: Response) => {
     }
 
    const hashedPin = await hashPassword(pin.toString())
-    const updatedProfile = await prisma.userProfile.update({
+    const updatedPin = await prisma.userPlatformPin.update({
       where: { userID: userId },
       data: {
         platformPin: hashedPin, 
@@ -212,17 +209,17 @@ export const verifyPin = async (req: Request, res: Response) => {
       })
     }
     const hashedPin = await hashPassword(pin.toString())
-    const userProfile = await prisma.userProfile.findUnique({
+    const userPin = await prisma.userPlatformPin.findUnique({
       where: { userID },
       select: { platformPin: true },  
     })
-    if (!userProfile || !userProfile.platformPin) {
+    if (!userPin || !userPin.platformPin) {
       return res.json({
         success: false,
         message: "No PIN set for this user",
       });
     } 
-    if (userProfile.platformPin !== hashedPin) {
+    if (userPin.platformPin !== hashedPin) {
       return res.json({
         success: false,
         message: "Incorrect PIN",

@@ -1,6 +1,7 @@
 import express from "express";
 import { Request,Response } from "express";
 import cors from "cors"
+import quoteRouter from "./routes/quote";
 const app = express()
 const port = 4001
 //middlewares
@@ -23,5 +24,6 @@ app.get("/health",async (req:Request,res:Response) => {
     }
 })
 
+app.use("/anton/api/v1/quote",quoteRouter)
 
 app.listen(port)

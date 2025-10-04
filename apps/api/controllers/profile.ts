@@ -42,8 +42,6 @@ export const setupProfile = async (req: Request, res: Response) => {
         phoneNumber:phoneNumber,
         address:address,
         country:country,
-        pnIsVerified:false,
-        platformPin:"",
         userID:userId
       }
     })
@@ -94,7 +92,7 @@ export const getUserProfileData = async (req: Request, res: Response) => {
         phoneNumber: true,
         country: true,
         address: true,
-        pnIsVerified: true,
+         
       },
     });
     if (!userData) {

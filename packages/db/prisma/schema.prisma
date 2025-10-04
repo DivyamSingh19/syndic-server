@@ -9,6 +9,31 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum TransactionMethod{
+  CryptoTransaction
+  CentralizedTransaction
+  CryptoToCentralized
+  CentralizedToCrypto
+}
+
+enum SupportedCurrencies{
+  AED
+  USD
+  INR
+}
+
+enum SupportedCrypto{
+  USDT
+  USDC
+  ETH
+  SOL
+}
+
+enum KYCStatus{
+  COMPLETED
+  INCOMPLETE 
+  VERIFICATION_PENDING
+}
 model Users {
   id String @id @default(uuid())
   email String @unique
@@ -25,6 +50,13 @@ model Users {
   userProfile  UserProfile[]
   successfulTransactions  SuccessfulTransactions[]
   failedTransactions     FailedTransactions[]
+  centralizedTransactions   CentralizedTransactions[]
+  cryptoTransactions     CryptoTransactions[]
+  cryptoToFiatTransactions   CryptoToFiatTransactions[]
+  fiatToCryptoTransactions   FiatToCryptoTransactions[]
+  syndicWallet               SyndicWallet[]
+  kyc                        UserKYC[]
+  platformPin                UserPlatformPin[]
 }
 
 model UserProfile{
@@ -32,17 +64,35 @@ model UserProfile{
   phoneNumber String @unique //this has to be with the country code
   country  String
   address  String
-  pnIsVerified  Boolean
-  platformPin  String 
+  defaultCryptoWallet  String? //to store a default wallet to make the overall 
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
-
-
   //relation
   userID   String  @unique
   user     Users @relation(fields: [userID], references: [id])
+
  }
 
+model UserPlatformPin{
+  id String @id @default(uuid())
+  userID String @unique
+  user   Users @relation(fields: [userID],references: [id])
+  platformPin String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+model UserKYC{
+  id String @id @default(uuid())
+  userId String @unique
+  user   Users   @relation(fields: [userId],references: [id])
+  panNumber         String    @unique
+  aadhaarNumber     String    @unique
+  panImageUrl       String
+  aadhaarImageUrl   String
+  status            KYCStatus @default(VERIFICATION_PENDING)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+}
 model SuccessfulTransactions{
   id String @id @default(uuid())
   userId String
@@ -52,10 +102,12 @@ model SuccessfulTransactions{
   senderCountry   String
   receiverCountry  String
   routeUsed        String
-  
+  method           TransactionMethod
   //relations
   userID  String @unique
   user  Users  @relation(fields: [userID],references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
 model FailedTransactions{
@@ -67,9 +119,119 @@ model FailedTransactions{
   senderCountry   String
   receiverCountry  String
   routeUsed        String
-
+  method           TransactionMethod
 
   userID  String @unique
   user    Users  @relation(fields: [userID],references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
+model CryptoTransactions{
+  id  String @id @default(uuid())
+  userId  String 
+  user Users @relation(fields: [userId],references: [id])
+  userWallet  String  //crypto wallet address
+  receiverWallet  String 
+  senderCrypto  String
+  receiverCrypto String
+  routes    CryptoToCryptoRoutes[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model CentralizedTransactions{
+  id   String @id @default(uuid())
+  userId  String 
+  user Users @relation(fields: [userId],references: [id])
+  receiverId String?
+  senderCurrency String
+  receiverCurrency String
+  senderCountry  String
+  receiverCountry String
+  routes     FiatToFiatRoutes[]
+
+  createdAt DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model CryptoToFiatTransactions{
+  id   String @id  @default(uuid())
+  userId  String
+  user Users @relation(fields: [userId],references: [id])
+  senderWalletAddress String
+  receiverId   String? 
+  receiverCurrency String
+  senderCrypto  String
+  senderCountry String
+  receiverCountry String
+  routes   CryptoToFiatRoutes[]
+
+  createdAt DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model FiatToCryptoTransactions{
+  id  String @id @default(uuid())
+  userId  String 
+  user Users  @relation(fields: [userId],references: [id])
+  senderCurrency String
+  receiverId  String? 
+  receiverWallet String
+  recieverCrypto String
+  routes     FiatToCryptoRoutes[]
+  
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+
+model FiatToFiatRoutes{
+  id String @id @default(uuid())
+  transactionId String
+  transaction CentralizedTransactions @relation(fields: [transactionId],references: [id])
+
+}
+
+model FiatToCryptoRoutes{
+  id  String @id @default(uuid())
+  transactionId String
+  transaction  FiatToCryptoTransactions @relation(fields: [transactionId],references: [id])
+  //not much as razorpay payment => success => credit crypto to receiver wallet
+}
+
+model CryptoToFiatRoutes{
+  id String @id @default(uuid())
+  transactionId  String
+  transaction  CryptoToFiatTransactions @relation(fields: [transactionId],references: [id])
+  offRampProvider  String
+  cryptoProvider   String
+  estimatedFees    Float
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model CryptoToCryptoRoutes{
+  id  String @id @default(uuid())
+  sourceToken String
+  destinationToken String
+  path  Json //routing path eg. Jupiter sawp path
+  minSlippage Int //acceptable slippage
+  liquiditySource String
+  estimatedFee  Float
+
+  createdAt DateTime @default(now())
+  //references
+  transactionId String
+  transaction CryptoTransactions @relation(fields: [transactionId],references: [id])
+}
+
+
+model SyndicWallet{
+  id  String @id @default(uuid())
+  totalAED   Float?
+  totalINR   Float?
+  totalUSD   Float?
+  userId  String @unique
+  user    Users @relation(fields: [userId],references: [id])
+}

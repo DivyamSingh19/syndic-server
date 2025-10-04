@@ -1,8 +1,8 @@
 {
-  "name": "redis",
+  "name": "@repo/redis",
   "version": "1.0.0",
   "description": "",
-  "main": "redis.js",
+  "main": "dist/redis.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

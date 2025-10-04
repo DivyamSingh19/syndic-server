@@ -26,7 +26,7 @@ export const createAccessToken = (
   secret: string,
   expiresIn: string 
 ): string => {
-  return jwt.sign(payload, secret, { expiresIn: expiresIn as any });
+  return jwt.sign(payload, secret, { expiresIn:"15m" });
 };
 
 export const createRefreshToken = (
@@ -34,7 +34,7 @@ export const createRefreshToken = (
   secret: string,
   expiresIn: string 
 ): string => {
-  return jwt.sign(payload, secret, { expiresIn: expiresIn as any });
+  return jwt.sign(payload, secret, { expiresIn:"7d" });
 };
 
 export const verifyAccessToken = (token: string, secret: string) => {

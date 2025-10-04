@@ -1,5 +1,4 @@
 import prisma from "@repo/db";
-
 import redis from "../config/redis/config"; //just for otp , primary server redis 
 import { Request,Response } from "express";
 import resend from "../config/resend/config";
@@ -16,15 +15,15 @@ export const sendOTP = async (req:Request,res:Response) => {
                 message:"Bad request, email not provided"
             })
         }
-        // const user = await prisma.users.findUnique({
-        //     where:{email:userEmail}
-        // })
-        // if(!user){
-        //     return res.status(404).json({
-        //         success:false,
-        //         message:"User not found"
-        //     })
-        // }
+        const user = await prisma.users.findUnique({
+            where:{email:userEmail}
+        })
+        if(!user){
+            return res.status(404).json({
+                success:false,
+                message:"User not found"
+            })
+        }
         const otp = generateOTP();
         await redis.set(`otp:${userEmail}`,otp,"EX",300)
 
