@@ -10,7 +10,7 @@ const PaymentButton = ({ amount }: { amount: number }) => {
     setLoading(true);
     try {
       
-      const { data } = await axios.post('http://localhost:5000/api/razorpay/create-transaction', { amount });
+      const { data } = await axios.post('http://localhost:5000/api/v2/razorpay/create-transaction', { amount });
 
       const options = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_TEST_KEY_ID, 
@@ -21,7 +21,7 @@ const PaymentButton = ({ amount }: { amount: number }) => {
         order_id: data.id,
         handler: async function (response: any) {
          
-          await axios.post('http://localhost:5000/api/razorpay/verify-payment', response);
+          await axios.post('http://localhost:5000/api/v2/razorpay/verify-payment', response);
           alert('Payment Successful!');
         },
         prefill: {
