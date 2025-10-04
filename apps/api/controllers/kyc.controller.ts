@@ -1,15 +1,28 @@
 import { Request, Response } from 'express';
 import prisma from '@repo/db';
+import { uploadToCloudinary } from '../utils/cloudinaryUpload';
 // Add new KYC information
 export const addKYCInfo = async (req: Request, res: Response) => {
   try {
-    const { userId, panNumber, aadhaarNumber, panImageUrl, aadhaarImageUrl, status } = req.body;
-
-    // Validate required fields
-    if (!userId || !panNumber || !aadhaarNumber || !panImageUrl || !aadhaarImageUrl) {
+    const { userId, panNumber, aadhaarNumber } = req.body;
+    
+    // Check if required fields are present
+    if (!userId || !panNumber || !aadhaarNumber) {
       return res.status(400).json({
         success: false,
-        message: 'All fields are required'
+        message: 'userId, panNumber, and aadhaarNumber are required'
+      });
+    }
+
+    // Check if uploaded files are present
+    const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+    const panImageFile = files?.panImage?.[0];
+    const aadhaarImageFile = files?.aadhaarImage?.[0];
+    
+    if (!panImageFile && !aadhaarImageFile) {
+      return res.status(400).json({
+        success: false,
+        message: 'PAN image and Aadhaar image files are required'
       });
     }
 
@@ -23,6 +36,29 @@ export const addKYCInfo = async (req: Request, res: Response) => {
         success: false,
         message: 'KYC already exists for this user'
       });
+    }
+
+    let panImageUrl = '';
+    let aadhaarImageUrl = '';
+
+    // Upload PAN image to Cloudinary
+    if (panImageFile) {
+      const panUploadResult = await uploadToCloudinary(
+        panImageFile.buffer,
+        `kyc/${userId}/pan`,
+        `pan_${userId}_${Date.now()}`
+      );
+      panImageUrl = panUploadResult.url;
+    }
+
+    // Upload Aadhaar image to Cloudinary
+    if (aadhaarImageFile) {
+      const aadhaarUploadResult = await uploadToCloudinary(
+        aadhaarImageFile.buffer,
+        `kyc/${userId}/aadhaar`,
+        `aadhaar_${userId}_${Date.now()}`
+      );
+      aadhaarImageUrl = aadhaarUploadResult.url;
     }
 
     // Create KYC record
@@ -62,7 +98,7 @@ export const addKYCInfo = async (req: Request, res: Response) => {
 export const updateKYC = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
-    const { panNumber, aadhaarNumber, panImageUrl, aadhaarImageUrl } = req.body;
+    const { panNumber, aadhaarNumber } = req.body;
 
     // Check if KYC exists
     const existingKYC = await prisma.userKYC.findUnique({
@@ -76,15 +112,40 @@ export const updateKYC = async (req: Request, res: Response) => {
       });
     }
 
+    // Get uploaded files
+    const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+    const panImageFile = files?.panImage?.[0];
+    const aadhaarImageFile = files?.aadhaarImage?.[0];
+
+    let updateData: any = {
+      ...(panNumber && { panNumber }),
+      ...(aadhaarNumber && { aadhaarNumber }),
+    };
+
+    // Upload new PAN image if provided
+    if (panImageFile) {
+      const panUploadResult = await uploadToCloudinary(
+        panImageFile.buffer,
+        `kyc/${userId}/pan`,
+        `pan_${userId}_${Date.now()}`
+      );
+      updateData.panImageUrl = panUploadResult.url;
+    }
+
+    // Upload new Aadhaar image if provided
+    if (aadhaarImageFile) {
+      const aadhaarUploadResult = await uploadToCloudinary(
+        aadhaarImageFile.buffer,
+        `kyc/${userId}/aadhaar`,
+        `aadhaar_${userId}_${Date.now()}`
+      );
+      updateData.aadhaarImageUrl = aadhaarUploadResult.url;
+    }
+
     // Update KYC record
     const updatedKYC = await prisma.userKYC.update({
       where: { userId },
-      data: {
-        ...(panNumber && { panNumber }),
-        ...(aadhaarNumber && { aadhaarNumber }),
-        ...(panImageUrl && { panImageUrl }),
-        ...(aadhaarImageUrl && { aadhaarImageUrl })
-      }
+      data: updateData
     });
 
     return res.status(200).json({

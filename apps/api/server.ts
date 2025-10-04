@@ -9,6 +9,7 @@ import pinRouter from "./routes/pin";
 import otpRouter from "./routes/otp";
 import verificationRouter from "./routes/verifyUser";
 import getUserRouter from "./routes/getAllUsers";
+import kycRouter from "./routes/kyc.router";
 
 const app = express();
 const port = 4000;
@@ -28,6 +29,7 @@ app.use("/api/v1/pin",pinRouter) //pin
 app.use('/api/v1/otp',otpRouter)//otp  
 app.use('/api/v1/verification',verificationRouter)//user verification, use only once
 app.use("/api/v1/all-users",getUserRouter); //users search
+app.use("/api/v1/kyc", kycRouter); //kyc operations
 
 
 app.get("/health", async (req: Request, res: Response) => {
