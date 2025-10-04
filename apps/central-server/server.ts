@@ -6,12 +6,18 @@ import razorpayRouter from "./routes/razorpay"
 import fiatToCryptoRouter from "./routes/fiattocrypto.route"
 import previousTransactionRouter from "./routes/getUserTransactions.routes"
 import walletRouter from "./routes/wallet.router"
+import fiatToFiatRouter from "./routes/fiattofiat.routes"
 
 
 const app = express()
 const port = 5000
 app.use(express.json())
-app.use(cors())
+app.use(cors(
+    {
+        origin:["http://localhost:3000","http://localhost:3001","http://localhost:3002"],
+        credentials:true
+    }
+))
 app.use(cookieParser())
 
 app.get('/health', async (req:Request,res:Response) => {
@@ -34,7 +40,7 @@ app.use('/api/v2/razorpay',razorpayRouter)
 app.use('/api/v2/transaction/combination',fiatToCryptoRouter)
 app.use('/api/v2/get-transaction-data',previousTransactionRouter)
 app.use('/api/v2/wallet',walletRouter)
-app.use('/api/v2/transaction/fiat-to-fiat',)
+app.use('/api/v2/transaction/fiat-to-fiat',fiatToFiatRouter)
 app.listen(port,()=>{
     console.log("Server started on :",port)
 })
