@@ -5,7 +5,7 @@ import { Request,Response } from "express";
 
 export const getWalletData = async (req:Request,res:Response) => {
     try {
-        const { userEmail } = req.params;
+        const { userEmail } = req.body;
         
         if (!userEmail) {
             return res.status(400).json({
@@ -26,7 +26,7 @@ export const getWalletData = async (req:Request,res:Response) => {
             });
         }
 
-        // Get wallet data
+     
         const walletData = await prisma.syndicWallet.findUnique({
             where: { userEmail: userEmail },
             include: {
