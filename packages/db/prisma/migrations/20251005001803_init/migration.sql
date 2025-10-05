@@ -53,7 +53,7 @@ CREATE TABLE "public"."UserPlatformPin" (
 -- CreateTable
 CREATE TABLE "public"."UserKYC" (
     "id" TEXT NOT NULL,
-    "userId" TEXT NOT NULL,
+    "userEmail" TEXT NOT NULL,
     "panNumber" TEXT NOT NULL,
     "aadhaarNumber" TEXT NOT NULL,
     "panImageUrl" TEXT NOT NULL,
@@ -68,15 +68,14 @@ CREATE TABLE "public"."UserKYC" (
 -- CreateTable
 CREATE TABLE "public"."SuccessfulTransactions" (
     "id" TEXT NOT NULL,
-    "userId" TEXT NOT NULL,
-    "receiverId" TEXT,
+    "receiverEmail" TEXT NOT NULL,
     "currencySent" TEXT NOT NULL,
     "currencyReceived" TEXT NOT NULL,
     "senderCountry" TEXT NOT NULL,
     "receiverCountry" TEXT NOT NULL,
     "routeUsed" TEXT NOT NULL,
     "method" "public"."TransactionMethod" NOT NULL,
-    "userID" TEXT NOT NULL,
+    "userEmail" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -86,15 +85,14 @@ CREATE TABLE "public"."SuccessfulTransactions" (
 -- CreateTable
 CREATE TABLE "public"."FailedTransactions" (
     "id" TEXT NOT NULL,
-    "userId" TEXT NOT NULL,
-    "receiverId" TEXT,
+    "receiverEmail" TEXT NOT NULL,
     "currencySent" TEXT NOT NULL,
     "currencyReceived" TEXT NOT NULL,
     "senderCountry" TEXT NOT NULL,
     "receiverCountry" TEXT NOT NULL,
     "routeUsed" TEXT NOT NULL,
     "method" "public"."TransactionMethod" NOT NULL,
-    "userID" TEXT NOT NULL,
+    "userEmail" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -119,7 +117,7 @@ CREATE TABLE "public"."CryptoTransactions" (
 CREATE TABLE "public"."FiatToFiatTransaction" (
     "id" TEXT NOT NULL,
     "userEmail" TEXT NOT NULL,
-    "receiverId" TEXT,
+    "receiverEmail" TEXT,
     "senderCurrency" TEXT NOT NULL,
     "receiverCurrency" TEXT NOT NULL,
     "senderCountry" TEXT NOT NULL,
@@ -231,7 +229,7 @@ CREATE UNIQUE INDEX "UserProfile_userID_key" ON "public"."UserProfile"("userID")
 CREATE UNIQUE INDEX "UserPlatformPin_userID_key" ON "public"."UserPlatformPin"("userID");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "UserKYC_userId_key" ON "public"."UserKYC"("userId");
+CREATE UNIQUE INDEX "UserKYC_userEmail_key" ON "public"."UserKYC"("userEmail");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "UserKYC_panNumber_key" ON "public"."UserKYC"("panNumber");
@@ -240,10 +238,7 @@ CREATE UNIQUE INDEX "UserKYC_panNumber_key" ON "public"."UserKYC"("panNumber");
 CREATE UNIQUE INDEX "UserKYC_aadhaarNumber_key" ON "public"."UserKYC"("aadhaarNumber");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "SuccessfulTransactions_userID_key" ON "public"."SuccessfulTransactions"("userID");
-
--- CreateIndex
-CREATE UNIQUE INDEX "FailedTransactions_userID_key" ON "public"."FailedTransactions"("userID");
+CREATE UNIQUE INDEX "FailedTransactions_userEmail_key" ON "public"."FailedTransactions"("userEmail");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "SyndicWallet_userEmail_key" ON "public"."SyndicWallet"("userEmail");
@@ -255,13 +250,13 @@ ALTER TABLE "public"."UserProfile" ADD CONSTRAINT "UserProfile_userID_fkey" FORE
 ALTER TABLE "public"."UserPlatformPin" ADD CONSTRAINT "UserPlatformPin_userID_fkey" FOREIGN KEY ("userID") REFERENCES "public"."Users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "public"."UserKYC" ADD CONSTRAINT "UserKYC_userId_fkey" FOREIGN KEY ("userId") REFERENCES "public"."Users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "public"."UserKYC" ADD CONSTRAINT "UserKYC_userEmail_fkey" FOREIGN KEY ("userEmail") REFERENCES "public"."Users"("email") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "public"."SuccessfulTransactions" ADD CONSTRAINT "SuccessfulTransactions_userID_fkey" FOREIGN KEY ("userID") REFERENCES "public"."Users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "public"."SuccessfulTransactions" ADD CONSTRAINT "SuccessfulTransactions_userEmail_fkey" FOREIGN KEY ("userEmail") REFERENCES "public"."Users"("email") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "public"."FailedTransactions" ADD CONSTRAINT "FailedTransactions_userID_fkey" FOREIGN KEY ("userID") REFERENCES "public"."Users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "public"."FailedTransactions" ADD CONSTRAINT "FailedTransactions_userEmail_fkey" FOREIGN KEY ("userEmail") REFERENCES "public"."Users"("email") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "public"."CryptoTransactions" ADD CONSTRAINT "CryptoTransactions_userEmail_fkey" FOREIGN KEY ("userEmail") REFERENCES "public"."Users"("email") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -277,9 +272,6 @@ ALTER TABLE "public"."FiatToCryptoTransactions" ADD CONSTRAINT "FiatToCryptoTran
 
 -- AddForeignKey
 ALTER TABLE "public"."FiatToFiatRoutes" ADD CONSTRAINT "FiatToFiatRoutes_transactionId_fkey" FOREIGN KEY ("transactionId") REFERENCES "public"."FiatToFiatTransaction"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "public"."FiatToCryptoRoutes" ADD CONSTRAINT "FiatToCryptoRoutes_transactionId_fkey" FOREIGN KEY ("transactionId") REFERENCES "public"."FiatToCryptoTransactions"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "public"."CryptoToFiatRoutes" ADD CONSTRAINT "CryptoToFiatRoutes_transactionId_fkey" FOREIGN KEY ("transactionId") REFERENCES "public"."CryptoToFiatTransactions"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

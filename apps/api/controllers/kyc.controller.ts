@@ -4,10 +4,10 @@ import { uploadToCloudinary } from '../utils/cloudinaryUpload';
 // Add new KYC information
 export const addKYCInfo = async (req: Request, res: Response) => {
   try {
-    const { userId, panNumber, aadhaarNumber } = req.body;
+    const { userEmail, panNumber, aadhaarNumber } = req.body;
     
     // Check if required fields are present
-    if (!userId || !panNumber || !aadhaarNumber) {
+    if (!userEmail || !panNumber || !aadhaarNumber) {
       return res.status(400).json({
         success: false,
         message: 'userId, panNumber, and aadhaarNumber are required'
@@ -28,7 +28,7 @@ export const addKYCInfo = async (req: Request, res: Response) => {
 
     // Check if KYC already exists
     const existingKYC = await prisma.userKYC.findUnique({
-      where: { userId }
+      where: { userEmail:userEmail }
     });
 
     if (existingKYC) {
@@ -45,8 +45,8 @@ export const addKYCInfo = async (req: Request, res: Response) => {
     if (panImageFile) {
       const panUploadResult = await uploadToCloudinary(
         panImageFile.buffer,
-        `kyc/${userId}/pan`,
-        `pan_${userId}_${Date.now()}`
+        `kyc/${userEmail}/pan`,
+        `pan_${userEmail}_${Date.now()}`
       );
       panImageUrl = panUploadResult.url;
     }
@@ -55,8 +55,8 @@ export const addKYCInfo = async (req: Request, res: Response) => {
     if (aadhaarImageFile) {
       const aadhaarUploadResult = await uploadToCloudinary(
         aadhaarImageFile.buffer,
-        `kyc/${userId}/aadhaar`,
-        `aadhaar_${userId}_${Date.now()}`
+        `kyc/${userEmail}/aadhaar`,
+        `aadhaar_${userEmail}_${Date.now()}`
       );
       aadhaarImageUrl = aadhaarUploadResult.url;
     }
@@ -64,7 +64,7 @@ export const addKYCInfo = async (req: Request, res: Response) => {
     // Create KYC record
     const kycData = await prisma.userKYC.create({
       data: {
-        userId,
+        userEmail,
         panNumber,
         aadhaarNumber,
         panImageUrl,

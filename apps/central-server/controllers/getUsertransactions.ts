@@ -93,7 +93,7 @@ export const getFiatToCryptoTransactions = async (
     const transactions = await prisma.fiatToCryptoTransactions.findMany({
       where: { userEmail: userEmail },
       include: {
-        routes: true,
+        
         user: {
           select: {
             id: true,

@@ -104,7 +104,7 @@ model SuccessfulTransactions{
   routeUsed        String
   method           TransactionMethod
   //relations
-  userEmail  String @unique
+  userEmail  String 
   user  Users  @relation(fields: [userEmail],references: [email])
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
