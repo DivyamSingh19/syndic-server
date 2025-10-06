@@ -3,9 +3,9 @@
 
 ### 💡 Overview
 
-**Syndic** is a blockchain-powered cross-border payments platform designed to make **micro and regular remittances** instant, transparent, and affordable — especially for migrant workers and freelancers sending money between countries like **India and the UAE**.
+**Syndic** is a blockchain-powered cross-border payments platform designed to make **micro and regular remittances** instant, transparent, and affordable  especially for migrant workers and freelancers sending money between countries like **India and the UAE**.
 
-Traditional remittance networks like **SWIFT** or intermediaries like **Remitly** charge high fees and take days to settle. Syndic solves this by introducing a **network of regionally connected “sister wallets”** that mirror and sync balances across countries — enabling **real-time off-ramping and on-ramping** between fiat and crypto rails.
+Traditional remittance networks like **SWIFT** or intermediaries like **Remitly** charge high fees and take days to settle. Syndic solves this by introducing a **network of regionally connected “sister wallets”** that mirror and sync balances across countries  enabling **real-time off-ramping and on-ramping** between fiat and crypto rails.
 
 ---
 
@@ -33,7 +33,7 @@ Traditional remittance networks like **SWIFT** or intermediaries like **Remitly*
 
 ### 🌐 Example Use Case
 
-A construction worker in **Dubai** can send money to his family in **Kerala** in **seconds** — no waiting, no hidden fees, and complete transparency on every transaction.
+A construction worker in **Dubai** can send money to his family in **Kerala** in **seconds**  no waiting, no hidden fees, and complete transparency on every transaction.
 
 ---
 
