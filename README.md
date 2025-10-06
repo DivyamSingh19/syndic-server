@@ -44,5 +44,5 @@ A construction worker in **Dubai** can send money to his family in **Kerala** in
 * **Blockchain Layer:** Solana + custom liquidity management smart contracts
 ---
 
-Checkout my portfolio :(https://divyamm.xyz)
+Checkout my portfolio : https://divyamm.xyz
 
